@@ -1,0 +1,110 @@
+Git - hw5.txt
+
+Part C :
+
+Create a new git repository somewhere in your filesystem, and configure a remote with remote url.
+bhkolli$ mkdir hw5
+ bhkolli$ cd hw5
+hw5 bhkolli$ git init
+Initialized empty Git repository in /Users/bhkolli/hw5/.git/
+hw5 bhkolli$ git remote add origin git@github.com:navatharaagi/reposit.git
+hw5 bhkolli$ git remote
+origin
+
+What command did you use to configure the remote?
+git remote add origin <url>
+
+Instead of creating a new git repository and configuring it with this remote, I could have asked you to git clone the repo from afs. If you had done so, what would the output of git remote -v be?
+
+temp bhkolli$ git clone git@github.com:navatharaagi/reposit.git
+Cloning into 'reposit'...
+warning: You appear to have cloned an empty repository.
+Checking connectivity... done.
+temp bhkolli$ cd reposit
+reposit bhkolli$ git remote -v
+origin	git@github.com:navatharaagi/reposit.git (fetch)
+origin	git@github.com:navatharaagi/reposit.git (push)
+
+Run git fetch remotename (substituting your remote name for remotename).
+Did anything appear in your working directory? Why?
+
+reposit bhkolli$ git fetch
+reposit bhkolli$ git status
+On branch master
+Initial commit
+nothing to commit (create/copy files and use "git add" to track)
+
+No changes from remote repo to local.
+
+Update your local master branch with the remote one, and give the command you used to do so.
+
+reposit bhkolli$ cd ..
+ bhkolli$ cd hw5
+hw5 bhkolli$ touch file.txt
+hw5 bhkolli$ git add file.txt
+hw5 bhkolli$ git commit -m 'committing file.txt'
+[master (root-commit) 9037166] committing file.txt
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 file.txt
+hw5 bhkolli$ git branch
+* master
+hw5 bhkolli$ git push -u origin master
+Counting objects: 3, done.
+Writing objects: 100% (3/3), 218 bytes | 0 bytes/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To git@github.com:navatharaagi/reposit.git
+ * [new branch]      master -> master
+Branch master set up to track remote branch master from origin.
+
+
+Your working directory should have been updated. You should check that. That means the master branch was updated on the remote. But it's possible that when we ran git fetch, we fetched other branches as well! How could we (i.e. what command could we use) find all the branches we may have gotten from the remote?
+
+https://github.com/navatharaagi/reposit
+
+hw5 bhkolli$ git fetch
+From github.com:navatharaagi/reposit
+ * [new branch]      newbranch  -> origin/newbranch
+
+hw5 bhkolli$ git branch -r
+  origin/master
+  origin/newbranch
+
+
+Spoiler: there's another branch. Check it out, find the file on that branch, and give the first five letters of that file as well as the command you used to checkout the branch. NOTE: It's very bad practice to directly git checkout the remote-tracking branch. Instead, try to checkout the branch so that it creates a local branch based on the remote-tracking branch. If you're not sure how (it's pretty easy to guess, though), you can look it up
+
+hw5 bhkolli$ git checkout -b newbranch origin/newbranch
+Branch newbranch set up to track remote branch newbranch from origin.
+Switched to a new branch 'newbranch'
+
+
+
+You're going to be submitting your homework on the master branch, so you may want to git checkout back there.
+
+hw5 bhkolli$ git checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+hw5 bhkolli$ git branch
+* master
+  newbranch
+
+
+What is a bare repository? What makes it different from normal repositories? In what situations is it used?
+
+If you run git clone --bare you'll get a bare repo, and if you run git clone , you'll get a non-bare one. Every public project that you've ever cloned (hosted on github, for example) is a bare repository on the other end. 
+
+A bare repository and a non-bare repository serve different purposes.
+The purpose of a bare repository is to share -- to integrate contributions from elsewhere. A non-bare repository is a clone of another repository, plus local state, such as .git/HEAD, which indicates which revision is checked out, the index, which is used to identify what has changed in the checked out tree and to help prepare commit objects, etc.
+We can see that having a "checked out state" for a repo that multiple people are committing to would serve no purpose. We push a commit on branch A,  other person push a commit on branch B, which state should the tree be in?
+We can still push and pull from non-bare repos; We do this sometimes when we work with multiple repos locally (to work on two different parts of a system, or to test two different versions). Sometimes we need to move changes from one repo to another, and having an additional remote referring to the other repo allows this.
+But that is very much outside the normal usage pattern. Generally, the bare repo will be on a server somewhere that people clone to get started with their work, and committers will push changes to that repo to be picked up by all. (Often, committers will be everyone, but not necessarily).
+Everyone will do their work in non-bare repos, and the results will be pushed to the bare repo.
+
+In lecture, I was careful to explain the two-step procedure of using git fetch and git merge remotename/branchname to get commits from a remote. When would this be a good idea as opposed to simply doing git pull remotename branchname? Briefly discuss remote-tracking branches and their relevance in your answer.
+Basically, there’s two types of branches: local, and remote-tracking. Local branches are pretty run of the mill, they’re just another path in the DAG that you can commit to. Remote-tracking branches have a few different purposes:
+They’re used to link what you’re working on locally compared to what’s on the remote.
+They will automatically know what remote branch to get changes from when you use git pull or git fetch.
+When branches are created using the --track option, they will be set up to linked to the remote branch.
+Local branches can also be created from any start point, be it a remote tracking branch.
+I didn't ask you to do this, but suppose I asked you to make a commit on the 'other' branch. If I wanted you to push this branch, what command would you use?
+$git push origin newbranch
+
